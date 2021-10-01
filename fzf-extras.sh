@@ -219,17 +219,17 @@ e() {
 fe() {
   local IFS=$'\n'
   local files=()
+  local columns=$(tmux display-message -p "#{window_width}")
+  local width
+  [[  $columns -ge 240  ]] && width=80 || width=90
   files=(
-    "$(fzf-tmux \
+    "$(fzf-tmux -p $width%,60% \
           --query="$1" \
           --multi \
           --select-1 \
           --exit-0 \
-          --preview="${FZF_PREVIEW_CMD}" \
-          --preview-window='right:hidden:wrap' \
-          --bind=ctrl-v:toggle-preview \
-          --bind=ctrl-x:toggle-sort \
-          --header='(view:ctrl-v) (sort:ctrl-x)'
+          --preview="bat --style=numbers --color=always --line-range :500 {}" \
+          --preview-window='right:nohidden:nowrap' \
     )"
   ) || return
   "${EDITOR:-vim}" "${files[@]}"
@@ -246,7 +246,7 @@ fo() {
 
   out=(
     "$(
-        fzf-tmux \
+        fzf \
           --query="$1" \
           --exit-0 \
           --expect=ctrl-o,ctrl-e
@@ -335,10 +335,8 @@ fco() {
   )" || return
 
   target="$(
-    printf '%s\n%s' "$tags" "$branches" \
-      | fzf-tmux \
-          -l40 \
-          -- \
+    printf '%s\n%s' "$branches" "$tags" \
+      | fzf \
           --no-hscroll \
           --ansi \
           +m \
@@ -402,12 +400,12 @@ fshow() {
 
   execute="grep -o \"[a-f0-9]\{7\}\" \
     | head -1 \
-    | xargs -I % sh -c 'git show --color=always %'"
+    | xargs -I % sh -c 'git -c delta.side-by-side=true show --color=always %'"
 
   git log \
     --graph \
     --color=always \
-    --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" \
+    --format="%C(auto)%h %C(green)%C(italic)%an%C(auto) %s%d %C(magenta)%cr" "$@" \
     | fzf \
         --ansi \
         --no-sort \
@@ -621,12 +619,17 @@ fs() {
   session="$(
     tmux list-sessions -F "#{session_name}" \
       | fzf-tmux \
+          -p \
           --query="$1" \
           --select-1 \
           --exit-0
   )" || return
 
-  tmux switch-client -t "$session"
+  if [[ -z "$TMUX" ]]; then
+      tmux attach -t "$session"
+  else 
+      tmux switch-client -t "$session"
+  fi
 }
 
 # ftpane - switch pane (@george-b)
