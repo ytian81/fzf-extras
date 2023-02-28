@@ -232,7 +232,7 @@ fe() {
   local IFS=$'\n'
   local files=()
   files=(
-    "$(fzf-tmux-wrapper \
+    "$(rg --files --follow --ignore-vcs > /dev/null 2>&1 | fzf-tmux-wrapper \
           --query="$1" \
           --multi \
           --select-1 \
@@ -243,6 +243,9 @@ fe() {
   ) || return
   "${EDITOR:-vim}" "${files[@]}"
 }
+
+zle -N fe
+bindkey '^f' fe
 
 # fo - Modified version of fe() where you can press
 #   - CTRL-O to open with $OPENER,
