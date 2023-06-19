@@ -122,7 +122,7 @@ zz() {
   local dir
 
   dir="$(
-    fasd -dl \
+    fasd -dl | rg $PWD \
       | fzf-tmux-wrapper \
           --tac \
           --reverse \
@@ -205,7 +205,7 @@ e() {
 
   files=(
   "$(
-    fasd -fl \
+    fasd -fl | rg $PWD \
       | fzf-tmux-wrapper \
           --tac \
           --reverse -1 \
