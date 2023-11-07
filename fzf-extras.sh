@@ -193,6 +193,8 @@ EOF
   fi
 }
 
+zle -N zdd
+bindkey '^g' zdd
 
 # -----------------------------------------------------------------------------
 # file
@@ -385,6 +387,9 @@ fs() {
       tmux switch-client -t "$session"
   fi
 }
+
+zle -N fs
+bindkey '^s' fs
 
 # ftpane - switch pane (@george-b)
 ftpane() {
