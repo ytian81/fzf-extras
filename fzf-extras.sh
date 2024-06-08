@@ -2,18 +2,6 @@
 
 
 # -----------------------------------------------------------------------------
-# tmux fzf wrapper
-# -----------------------------------------------------------------------------
-fzf-tmux-wrapper() {
-  local columns=$(tmux display-message -p "#{window_width}")
-  local width
-  [[  $columns -ge 240  ]] && width=80 || width=90
-
-  # fzf-tmux -p $width%,60% "$@"
-  fzf --tmux $width%,60% "$@"
-}
-
-# -----------------------------------------------------------------------------
 # directory
 # -----------------------------------------------------------------------------
 
@@ -31,7 +19,7 @@ zdd() {
   local dir
   dir="$(
     find "${1:-.}" -path '*/\.*' -prune -o -type d -print 2> /dev/null \
-      | fzf-tmux-wrapper +m \
+      | fzf +m \
           --preview='tree -C {} | head -n $FZF_PREVIEW_LINES' \
           --preview-window='right:wrap' \
           --bind=ctrl-v:toggle-preview \
@@ -46,7 +34,7 @@ zda() {
   local dir
   dir="$(
     find "${1:-.}" -type d 2> /dev/null \
-      | fzf-tmux-wrapper +m \
+      | fzf +m \
           --preview='tree -C {} | head -n $FZF_PREVIEW_LINES' \
           --preview-window='right:wrap' \
           --bind=ctrl-v:toggle-preview \
@@ -72,7 +60,7 @@ zdr() {
 
   parent_dir="$(
     get_parent_dirs "$(realpath "${1:-$PWD}")" \
-      | fzf-tmux-wrapper +m \
+      | fzf +m \
           --preview 'tree -C {} | head -n $FZF_PREVIEW_LINES' \
           --preview-window='right:wrap' \
           --bind=ctrl-v:toggle-preview \
@@ -91,7 +79,7 @@ zst() {
       | sed 's#\s#\n#g' \
       | uniq \
       | sed "s#^~#$HOME#" \
-      | fzf-tmux-wrapper +s +m -1 -q "$*" \
+      | fzf +s +m -1 -q "$*" \
             --preview='tree -C {} | head -n $FZF_PREVIEW_LINES' \
             --preview-window='right:wrap' \
             --bind=ctrl-v:toggle-preview \
@@ -108,7 +96,7 @@ zst() {
 # zdf - cd into the directory of the selected file
 zdf() {
   local file
-  file="$(fzf-tmux-wrapper +m -q "$*" \
+  file="$(fzf +m -q "$*" \
            --preview="${FZF_PREVIEW_CMD}" \
            --preview-window='right:wrap' \
            --bind=ctrl-v:toggle-preview \
@@ -124,7 +112,7 @@ zz() {
 
   dir="$(
     fasd -dl | rg $PWD \
-      | fzf-tmux-wrapper \
+      | fzf \
           --tac \
           --reverse \
           --select-1 \
@@ -209,7 +197,7 @@ e() {
   files=(
   "$(
     fasd -fl | rg $PWD \
-      | fzf-tmux-wrapper \
+      | fzf \
           --tac \
           --reverse -1 \
           --no-sort \
@@ -235,7 +223,7 @@ fe() {
   local IFS=$'\n'
   local files=()
   files=(
-    "$(rg --files --follow --ignore-vcs > /dev/null 2>&1 | fzf-tmux-wrapper \
+    "$(rg --files --follow --ignore-vcs > /dev/null 2>&1 | fzf \
           --query="$1" \
           --multi \
           --select-1 \
@@ -261,7 +249,7 @@ fo() {
 
   out=(
     "$(
-        fzf-tmux-wrapper \
+        fzf \
           --query="$1" \
           --exit-0 \
           --expect=ctrl-o,ctrl-e
@@ -286,7 +274,7 @@ v() {
       | while read -r line; do
           [[ -f "${line/\~/$HOME}" ]] && echo "$line"
         done \
-      | fzf-tmux-wrapper -m -0 -1 -q "$*"
+      | fzf -m -0 -1 -q "$*"
   )"
   "${EDITOR:-vim}" "${files/\~/$HOME}"
 }
@@ -303,7 +291,7 @@ runcmd() {
 # fh - repeat history
 fh() {
   ([[ -n "$ZSH_NAME" ]] && fc -l 1 || history) \
-    | fzf-tmux-wrapper +s --tac \
+    | fzf +s --tac \
     | sed -re 's/^\s*[0-9]+\s*//' \
     | runcmd
 }
@@ -316,7 +304,7 @@ writecmd() {
 # fhe - repeat history edit
 fhe() {
   ([[ -n "$ZSH_NAME" ]] && fc -l 1 || history) \
-    | fzf-tmux-wrapper +s --tac \
+    | fzf +s --tac \
     | sed -re 's/^\s*[0-9]+\s*//' \
     | writecmd
 }
@@ -333,7 +321,7 @@ fkill() {
   pid="$(
     ps -ef \
       | sed 1d \
-      | fzf-tmux-wrapper -m \
+      | fzf -m \
       | awk '{print $2}'
   )" || return
 
@@ -354,7 +342,7 @@ ftags() {
   line="$(
     awk 'BEGIN { FS="\t" } !/^!/ {print toupper($4)"\t"$1"\t"$2"\t"$3}' tags \
       | cut -c1-"$COLUMNS" \
-      | fzf-tmux-wrapper --nth=2 --tiebreak=begin
+      | fzf --nth=2 --tiebreak=begin
   )" || return
 
   "${EDITOR:-vim}" "$(cut -f3 <<< "$line")" \
@@ -375,7 +363,7 @@ fs() {
 
   session="$(
     tmux list-sessions -F "#{session_name}" \
-      | fzf-tmux-wrapper \
+      | fzf \
           -p \
           --query="$1" \
           --select-1 \
@@ -412,7 +400,7 @@ ftpane() {
   target="$(
     echo "$panes" \
       | grep -v "$current_pane" \
-      | fzf-tmux-wrapper +m --reverse
+      | fzf +m --reverse
   )" || return
 
   target_window="$(
