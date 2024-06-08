@@ -32,7 +32,7 @@ zdd() {
     find "${1:-.}" -path '*/\.*' -prune -o -type d -print 2> /dev/null \
       | fzf-tmux-wrapper +m \
           --preview='tree -C {} | head -n $FZF_PREVIEW_LINES' \
-          --preview-window='right:hidden:wrap' \
+          --preview-window='right:wrap' \
           --bind=ctrl-v:toggle-preview \
           --bind=ctrl-x:toggle-sort \
           --header='(view:ctrl-v) (sort:ctrl-x)' \
@@ -47,7 +47,7 @@ zda() {
     find "${1:-.}" -type d 2> /dev/null \
       | fzf-tmux-wrapper +m \
           --preview='tree -C {} | head -n $FZF_PREVIEW_LINES' \
-          --preview-window='right:hidden:wrap' \
+          --preview-window='right:wrap' \
           --bind=ctrl-v:toggle-preview \
           --bind=ctrl-x:toggle-sort \
           --header='(view:ctrl-v) (sort:ctrl-x)' \
@@ -73,7 +73,7 @@ zdr() {
     get_parent_dirs "$(realpath "${1:-$PWD}")" \
       | fzf-tmux-wrapper +m \
           --preview 'tree -C {} | head -n $FZF_PREVIEW_LINES' \
-          --preview-window='right:hidden:wrap' \
+          --preview-window='right:wrap' \
           --bind=ctrl-v:toggle-preview \
           --bind=ctrl-x:toggle-sort \
           --header='(view:ctrl-v) (sort:ctrl-x)' \
@@ -92,7 +92,7 @@ zst() {
       | sed "s#^~#$HOME#" \
       | fzf-tmux-wrapper +s +m -1 -q "$*" \
             --preview='tree -C {} | head -n $FZF_PREVIEW_LINES' \
-            --preview-window='right:hidden:wrap' \
+            --preview-window='right:wrap' \
             --bind=ctrl-v:toggle-preview \
             --bind=ctrl-x:toggle-sort \
             --header='(view:ctrl-v) (sort:ctrl-x)' \
@@ -109,7 +109,7 @@ zdf() {
   local file
   file="$(fzf-tmux-wrapper +m -q "$*" \
            --preview="${FZF_PREVIEW_CMD}" \
-           --preview-window='right:hidden:wrap' \
+           --preview-window='right:wrap' \
            --bind=ctrl-v:toggle-preview \
            --bind=ctrl-x:toggle-sort \
            --header='(view:ctrl-v) (sort:ctrl-x)' \
