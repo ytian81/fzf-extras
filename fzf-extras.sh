@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+# runcmd - utility function used to run the command in the shell
+runcmd() {
+  perl -e 'ioctl STDOUT, 0x5412, $_ for split //, <>'
+}
+
+# writecmd - utility function used to write the command in the shell
+writecmd() {
+  perl -e 'ioctl STDOUT, 0x5412, $_ for split //, do { chomp($_ = <>); $_ }'
+}
+
 
 # -----------------------------------------------------------------------------
 # directory
@@ -26,7 +36,7 @@ zdd() {
           --bind=ctrl-x:toggle-sort \
           --header='(view:ctrl-v) (sort:ctrl-x)' \
   )" || return
-  cd "$dir" || return
+  echo "cd $dir" | runcmd
 }
 
 # zda - including hidden directories
@@ -41,7 +51,7 @@ zda() {
           --bind=ctrl-x:toggle-sort \
           --header='(view:ctrl-v) (sort:ctrl-x)' \
   )" || return
-  cd "$dir" || return
+  echo "cd $dir" | runcmd
 }
 
 # zdr - cd to selected parent directory
@@ -68,7 +78,7 @@ zdr() {
           --header='(view:ctrl-v) (sort:ctrl-x)' \
   )" || return
 
-  cd "$parent_dir" || return
+  echo "cd $parent_dir" | runcmd
 }
 
 # zst - cd into the directory from stack
@@ -89,7 +99,7 @@ zst() {
   # check $dir exists for Ctrl-C interrupt
   # or change directory to $HOME (= no value cd)
   if [[ -d "$dir" ]]; then
-    cd "$dir" || return
+    echo "cd $dir" | runcmd
   fi
 }
 
@@ -103,7 +113,7 @@ zdf() {
            --bind=ctrl-x:toggle-sort \
            --header='(view:ctrl-v) (sort:ctrl-x)' \
        )"
-  cd "$(dirname "$file")" || return
+  echo "$(dirname "$file")" | runcmd
 }
 
 # zz - selectable cd to frecency directory
@@ -128,7 +138,7 @@ zz() {
           --header='(view:ctrl-v) (sort:ctrl-x)' \
   )" || return
 
-  cd "$dir" || return
+  echo "cd $dir" | runcmd
 }
 
 # zd - cd into selected directory with options
@@ -283,22 +293,12 @@ v() {
 # history
 # -----------------------------------------------------------------------------
 
-# runcmd - utility function used to run the command in the shell
-runcmd() {
-  perl -e 'ioctl STDOUT, 0x5412, $_ for split //, <>'
-}
-
 # fh - repeat history
 fh() {
   ([[ -n "$ZSH_NAME" ]] && fc -l 1 || history) \
     | fzf +s --tac \
     | sed -re 's/^\s*[0-9]+\s*//' \
     | runcmd
-}
-
-# writecmd - utility function used to write the command in the shell
-writecmd() {
-  perl -e 'ioctl STDOUT, 0x5412, $_ for split //, do { chomp($_ = <>); $_ }'
 }
 
 # fhe - repeat history edit
