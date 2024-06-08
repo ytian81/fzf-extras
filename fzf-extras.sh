@@ -9,7 +9,8 @@ fzf-tmux-wrapper() {
   local width
   [[  $columns -ge 240  ]] && width=80 || width=90
 
-  fzf-tmux -p $width%,60% "$@"
+  # fzf-tmux -p $width%,60% "$@"
+  fzf --tmux $width%,60% "$@"
 }
 
 # -----------------------------------------------------------------------------
