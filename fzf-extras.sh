@@ -31,7 +31,6 @@ zdd() {
     find "${1:-.}" -path '*/\.*' -prune -o -type d -print 2> /dev/null \
       | fzf +m \
           --preview='tree -C {} | head -n $FZF_PREVIEW_LINES' \
-          --preview-window='right:wrap' \
           --bind=ctrl-v:toggle-preview \
           --bind=ctrl-x:toggle-sort \
           --header='(view:ctrl-v) (sort:ctrl-x)' \
@@ -46,7 +45,6 @@ zda() {
     find "${1:-.}" -type d 2> /dev/null \
       | fzf +m \
           --preview='tree -C {} | head -n $FZF_PREVIEW_LINES' \
-          --preview-window='right:wrap' \
           --bind=ctrl-v:toggle-preview \
           --bind=ctrl-x:toggle-sort \
           --header='(view:ctrl-v) (sort:ctrl-x)' \
@@ -72,7 +70,6 @@ zdr() {
     get_parent_dirs "$(realpath "${1:-$PWD}")" \
       | fzf +m \
           --preview 'tree -C {} | head -n $FZF_PREVIEW_LINES' \
-          --preview-window='right:wrap' \
           --bind=ctrl-v:toggle-preview \
           --bind=ctrl-x:toggle-sort \
           --header='(view:ctrl-v) (sort:ctrl-x)' \
@@ -91,7 +88,6 @@ zst() {
       | sed "s#^~#$HOME#" \
       | fzf +s +m -1 -q "$*" \
             --preview='tree -C {} | head -n $FZF_PREVIEW_LINES' \
-            --preview-window='right:wrap' \
             --bind=ctrl-v:toggle-preview \
             --bind=ctrl-x:toggle-sort \
             --header='(view:ctrl-v) (sort:ctrl-x)' \
@@ -108,7 +104,6 @@ zdf() {
   local file
   file="$(fzf +m -q "$*" \
            --preview="${FZF_PREVIEW_CMD}" \
-           --preview-window='right:wrap' \
            --bind=ctrl-v:toggle-preview \
            --bind=ctrl-x:toggle-sort \
            --header='(view:ctrl-v) (sort:ctrl-x)' \
@@ -132,7 +127,6 @@ zz() {
           --bind=ctrl-x:toggle-sort \
           --query "$*" \
           --preview='tree -C {} | head -n $FZF_PREVIEW_LINES' \
-          --preview-window='right:hidden:wrap' \
           --bind=ctrl-v:toggle-preview \
           --bind=ctrl-x:toggle-sort \
           --header='(view:ctrl-v) (sort:ctrl-x)' \
@@ -216,7 +210,6 @@ e() {
           --bind=ctrl-x:toggle-sort \
           --query "$*" \
           --preview="${FZF_PREVIEW_CMD}" \
-          --preview-window='right:hidden:wrap' \
           --bind=ctrl-v:toggle-preview \
           --bind=ctrl-x:toggle-sort \
           --header='(view:ctrl-v) (sort:ctrl-x)' \
@@ -238,8 +231,7 @@ fe() {
           --multi \
           --select-1 \
           --exit-0 \
-          --preview="bat --style=numbers --color=always --line-range :500 {}" \
-          --preview-window='right:nohidden:nowrap' \
+          --preview="bat --style=numbers --color=always --line-range :500 {}"
     )"
   ) || return
   "${EDITOR:-vim}" "${files[@]}"
@@ -364,7 +356,6 @@ fs() {
   session="$(
     tmux list-sessions -F "#{session_name}" \
       | fzf \
-          -p \
           --query="$1" \
           --select-1 \
           --exit-0
